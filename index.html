@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Clicking Simulator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #121212;
+      color: white;
+    }
+    h1 {
+      margin-top: 40px;
+    }
+    button {
+      padding: 15px 25px;
+      font-size: 18px;
+      margin: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      background: #4CAF50;
+      color: white;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    #clickBtn {
+      font-size: 24px;
+      padding: 20px 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Clicking Simulator</h1>
+  <h2>Clicks: <span id="clicks">0</span></h2>
+  <h3>Clicks per second: <span id="cps">0</span></h3>
+  <h3>Time left: <span id="time">20</span>s</h3>
+
+  <button id="clickBtn">CLICK!</button>
+
+  <script>
+    let clicks = 0;
+    let clicksThisSecond = 0;
+    let timeLeft = 20;
+    let gameActive = true;
+
+    const clicksDisplay = document.getElementById("clicks");
+    const cpsDisplay = document.getElementById("cps");
+    const timeDisplay = document.getElementById("time");
+    const clickBtn = document.getElementById("clickBtn");
+
+    // Click handler
+    clickBtn.addEventListener("click", () => {
+      if (!gameActive) return;
+      clicks++;
+      clicksThisSecond++;
+      clicksDisplay.textContent = clicks;
+    });
+
+    // Every second update CPS + timer
+    const interval = setInterval(() => {
+      if (!gameActive) return;
+
+      // Update CPS
+      cpsDisplay.textContent = clicksThisSecond;
+      clicksThisSecond = 0;
+
+      // Update timer
+      timeLeft--;
+      timeDisplay.textContent = timeLeft;
+
+      // End game
+      if (timeLeft <= 0) {
+        gameActive = false;
+        clearInterval(interval);
+        clickBtn.disabled = true;
+        clickBtn.textContent = "Game Over!";
+        alert("Time's up! Total clicks: " + clicks);
+      }
+
+    }, 1000);
+  </script>
+
+</body>
+</html>
