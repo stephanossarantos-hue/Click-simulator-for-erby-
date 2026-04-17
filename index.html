@@ -2,57 +2,73 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Click Speed Game</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Clicker</title>
 
 <style>
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: radial-gradient(circle, #1a1a1a, #000);
-  color: white;
   text-align: center;
+  background: radial-gradient(circle, #111, #000);
+  color: white;
   overflow: hidden;
 }
 
+/* TEXT */
 h1 {
-  margin-top: 20px;
   font-size: 6vw;
 }
 
+/* STATS */
 .stats {
   font-size: 4vw;
-  margin: 10px;
+  margin: 5px;
 }
 
-#clickBtn {
-  margin-top: 30px;
-  font-size: 6vw;
-  padding: 25px 40px;
+/* BUTTONS */
+button {
+  font-size: 5vw;
+  padding: 15px 25px;
   border-radius: 20px;
   border: none;
-  background: linear-gradient(45deg, #00ffcc, #00ccff);
+  margin: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+/* CLICK BUTTON */
+#clickBtn {
+  background: linear-gradient(45deg, cyan, blue);
   color: black;
-  box-shadow: 0 0 20px #00ccff;
-  transition: transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 0 20px cyan;
 }
-
 #clickBtn:active {
-  transform: scale(1.2);
-  box-shadow: 0 0 40px #00ffff;
+  transform: scale(1.25) rotate(2deg);
+  box-shadow: 0 0 40px cyan;
 }
 
+/* START BUTTON */
+#startBtn {
+  background: lime;
+  color: black;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* RESTART */
 #restartBtn {
   display: none;
-  font-size: 5vw;
-  padding: 15px 30px;
-  border-radius: 15px;
-  border: none;
-  background: #ff4444;
+  background: red;
   color: white;
-  margin-top: 20px;
 }
 
+/* WASTED */
 #wasted {
   position: fixed;
   top: 40%;
@@ -61,25 +77,37 @@ h1 {
   color: red;
   opacity: 0;
   transform: scale(0.5);
-  transition: all 0.5s ease;
+  transition: 0.5s;
 }
-
 .showWasted {
   opacity: 1 !important;
-  transform: scale(1.2) !important;
+  transform: scale(1.3) !important;
 }
 
-/* Particle */
+/* REWARD TEXT */
+#rewardText {
+  position: fixed;
+  top: 20%;
+  width: 100%;
+  font-size: 6vw;
+  color: gold;
+  opacity: 0;
+  transition: 0.5s;
+}
+.showReward {
+  opacity: 1 !important;
+  transform: scale(1.2);
+}
+
+/* PARTICLES */
 .particle {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   background: cyan;
   border-radius: 50%;
-  pointer-events: none;
   animation: explode 0.6s forwards;
 }
-
 @keyframes explode {
   to {
     transform: translate(var(--x), var(--y));
@@ -91,102 +119,149 @@ h1 {
 
 <body>
 
-<h1>⚡ Click Speed Game</h1>
+<h1>⚡ Ultimate Clicker</h1>
 
 <div class="stats">Clicks: <span id="clicks">0</span></div>
 <div class="stats">CPS: <span id="cps">0</span></div>
 <div class="stats">Time: <span id="time">20</span>s</div>
 
-<button id="clickBtn">TAP FAST</button>
-<br>
+<button id="startBtn">START TIME</button><br>
+<button id="clickBtn" disabled>TAP!</button><br>
 <button id="restartBtn">Restart</button>
 
+<div id="rewardText"></div>
 <div id="wasted">WASTED</div>
 
 <script>
 let clicks = 0;
-let clicksThisSecond = 0;
-let timeLeft = 20;
-let started = false;
-let gameActive = false;
+let cps = 0;
+let clicksSecond = 0;
+let time = 20;
+
+let active = false;
+let multiplier = 1;
 
 const clicksEl = document.getElementById("clicks");
 const cpsEl = document.getElementById("cps");
 const timeEl = document.getElementById("time");
 const btn = document.getElementById("clickBtn");
+const startBtn = document.getElementById("startBtn");
 const restartBtn = document.getElementById("restartBtn");
 const wasted = document.getElementById("wasted");
+const rewardText = document.getElementById("rewardText");
 
-// Start game on first tap
-btn.addEventListener("click", (e) => {
-  if (!started) {
-    started = true;
-    gameActive = true;
-  }
+/* START */
+startBtn.onclick = () => {
+  active = true;
+  btn.disabled = false;
+  startBtn.style.display = "none";
+};
 
-  if (!gameActive) return;
+/* CLICK */
+btn.onclick = (e) => {
+  if (!active) return;
 
-  clicks++;
-  clicksThisSecond++;
+  clicks += multiplier;
+  clicksSecond += multiplier;
+
   clicksEl.textContent = clicks;
 
-  // SUPER animation: particles
+  spawnParticles(e);
+
+  checkRewards();
+};
+
+/* REWARDS */
+function checkRewards() {
+  if (clicks === 100) {
+    time += 50;
+    showReward("+50s BONUS!");
+  }
+
+  if (clicks === 250) {
+    time += 120;
+    multiplier = 2;
+    showReward("🔥 x2 MULTIPLIER +120s!");
+    document.body.style.background = "radial-gradient(circle, purple, black)";
+  }
+
+  if (clicks === 500) {
+    multiplier = 3;
+    showReward("⚡ x3 POWER MODE!");
+  }
+}
+
+/* SHOW REWARD */
+function showReward(text) {
+  rewardText.textContent = text;
+  rewardText.classList.add("showReward");
+
+  setTimeout(() => {
+    rewardText.classList.remove("showReward");
+  }, 1500);
+}
+
+/* PARTICLES */
+function spawnParticles(e) {
   for (let i = 0; i < 6; i++) {
     let p = document.createElement("div");
     p.className = "particle";
 
-    let angle = Math.random() * 2 * Math.PI;
-    let distance = Math.random() * 80 + 20;
+    let angle = Math.random() * Math.PI * 2;
+    let dist = Math.random() * 80;
 
-    p.style.setProperty("--x", Math.cos(angle) * distance + "px");
-    p.style.setProperty("--y", Math.sin(angle) * distance + "px");
+    p.style.setProperty("--x", Math.cos(angle) * dist + "px");
+    p.style.setProperty("--y", Math.sin(angle) * dist + "px");
 
     p.style.left = e.clientX + "px";
     p.style.top = e.clientY + "px";
 
     document.body.appendChild(p);
-
     setTimeout(() => p.remove(), 600);
   }
-});
+}
 
-// Game loop
-const interval = setInterval(() => {
-  if (!started || !gameActive) return;
+/* GAME LOOP */
+setInterval(() => {
+  if (!active) return;
 
-  cpsEl.textContent = clicksThisSecond;
-  clicksThisSecond = 0;
+  cpsEl.textContent = clicksSecond;
+  clicksSecond = 0;
 
-  timeLeft--;
-  timeEl.textContent = timeLeft;
+  time--;
+  timeEl.textContent = time;
 
-  if (timeLeft <= 0) {
-    gameActive = false;
+  if (time <= 0) {
+    active = false;
     btn.disabled = true;
 
     wasted.classList.add("showWasted");
-
     restartBtn.style.display = "inline-block";
   }
 }, 1000);
 
-// Restart
-restartBtn.addEventListener("click", () => {
+/* RESTART */
+restartBtn.onclick = () => {
   clicks = 0;
-  clicksThisSecond = 0;
-  timeLeft = 20;
-  started = false;
-  gameActive = false;
+  cps = 0;
+  clicksSecond = 0;
+  time = 20;
+  multiplier = 1;
+
+  active = false;
 
   clicksEl.textContent = 0;
   cpsEl.textContent = 0;
   timeEl.textContent = 20;
 
-  btn.disabled = false;
+  btn.disabled = true;
+  startBtn.style.display = "inline-block";
 
   wasted.classList.remove("showWasted");
   restartBtn.style.display = "none";
-});
+
+  document.body.style.background = "radial-gradient(circle, #111, #000)";
+};
 </script>
 
 </body>
