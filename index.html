@@ -3,110 +3,117 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Galaxy Chaos Clicker</title>
+<title>Galaxy Clicker (Fixed)</title>
 
 <style>
 body {
-  margin: 0;
-  font-family: Arial;
-  color: white;
-  text-align: center;
-  overflow: hidden;
-  background: black;
+  margin:0;
+  font-family:Arial;
+  color:white;
+  text-align:center;
+  background:black;
+  overflow:hidden;
 }
 
-/* 🌌 STARS */
+/* 🌌 stars */
 .star {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: white;
-  animation: fall linear infinite;
+  position:absolute;
+  width:2px;
+  height:2px;
+  background:white;
+  opacity:0.7;
+  animation:fall linear infinite;
 }
 @keyframes fall {
-  from { transform: translateY(-10px); }
-  to { transform: translateY(100vh); }
+  from {transform:translateY(-10px);}
+  to {transform:translateY(100vh);}
 }
 
 /* UI */
 .container {
-  position: relative;
-  z-index: 2;
-  padding: 10px;
+  position:relative;
+  z-index:2;
 }
 
-button {
-  font-size: 5vw;
-  padding: 10px 20px;
-  margin: 5px;
-  border-radius: 15px;
-  border: none;
+h1 { margin:10px; }
+
+.stats { font-size:18px; margin:5px; }
+
+/* button */
+#clickBtn {
+  padding:20px 40px;
+  font-size:24px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  transition:0.1s;
+}
+#clickBtn:active {
+  transform:scale(1.2);
 }
 
 /* skins */
-.skin-blue { background: linear-gradient(cyan, blue); }
-.skin-red { background: linear-gradient(red, orange); }
-.skin-green { background: linear-gradient(lime, green); }
+.skin-blue { background:linear-gradient(cyan,blue); }
+.skin-red { background:linear-gradient(red,orange); }
+.skin-green { background:linear-gradient(lime,green); }
 
-/* explosion */
-.explosion {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: yellow;
-  border-radius: 50%;
-  animation: boom 0.5s forwards;
+/* shop */
+#shop {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#111;
+  padding:10px;
+  display:flex;
+  justify-content:center;
+  gap:10px;
 }
-@keyframes boom {
-  to { transform: scale(6); opacity: 0; }
+
+.skinCard {
+  background:#222;
+  padding:10px;
+  border-radius:10px;
 }
 
 /* boss */
-#boss {
-  position: fixed;
-  top: 10%;
-  width: 80%;
-  left: 10%;
-  height: 25px;
-  background: red;
-  display: none;
+#bossBox {
+  position:fixed;
+  top:10px;
+  width:80%;
+  left:10%;
+  display:none;
+}
+#bossHP {
+  height:20px;
+  background:red;
 }
 #bossBar {
-  height: 100%;
-  background: lime;
-  width: 100%;
+  height:100%;
+  background:lime;
+  width:100%;
+}
+
+/* explosion */
+.explosion {
+  position:absolute;
+  width:10px;
+  height:10px;
+  background:yellow;
+  border-radius:50%;
+  animation:boom 0.5s forwards;
+}
+@keyframes boom {
+  to { transform:scale(5); opacity:0; }
 }
 
 /* leaderboard */
 #leaderboard {
-  position: fixed;
-  right: 5px;
-  top: 5px;
-  font-size: 3vw;
-  text-align: right;
+  position:fixed;
+  right:10px;
+  top:10px;
+  font-size:14px;
+  text-align:right;
 }
-
-/* shake */
-.shake {
-  animation: shake 0.2s;
-}
-@keyframes shake {
-  25% { transform: translate(-5px,5px); }
-  50% { transform: translate(5px,-5px); }
-}
-
-/* wasted */
-#wasted {
-  position: fixed;
-  top: 40%;
-  width: 100%;
-  font-size: 12vw;
-  color: red;
-  opacity: 0;
-  transform: scale(0.5);
-  transition: 0.5s;
-}
-.show { opacity: 1; transform: scale(1.4); }
 </style>
 </head>
 
@@ -115,57 +122,43 @@ button {
 <div id="stars"></div>
 
 <div class="container">
-<h1>🌌 Galaxy Chaos Clicker</h1>
+<h1>🌌 Galaxy Clicker</h1>
 
-<div>Clicks: <span id="clicks">0</span></div>
-<div>Time: <span id="time">20</span></div>
-<div>High Score: <span id="high">0</span></div>
+<div class="stats">Clicks: <span id="clicks">0</span></div>
+<div class="stats">Coins: <span id="coins">0</span></div>
+<div class="stats">Time: <span id="time">20</span></div>
 
-<button id="startBtn">START</button><br>
-<button id="clickBtn" disabled class="skin-blue">CLICK</button><br>
-
-<button onclick="buySkin('red')">Red (200)</button>
-<button onclick="buySkin('green')">Green (400)</button>
+<button id="startBtn">Start</button><br>
+<button id="clickBtn" disabled>CLICK</button>
 </div>
 
-<div id="boss"><div id="bossBar"></div></div>
-<div id="leaderboard"></div>
-<div id="wasted">WASTED</div>
+<!-- boss -->
+<div id="bossBox">
+  <div id="bossHP"><div id="bossBar"></div></div>
+</div>
 
-<!-- AUDIO -->
-<audio id="bgMusic" loop>
-<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b6d1c.mp3">
-</audio>
-<audio id="clickSound">
-<source src="https://cdn.pixabay.com/audio/2022/03/10/audio_c1a4c6f5b6.mp3">
-</audio>
+<!-- shop -->
+<div id="shop"></div>
+
+<!-- leaderboard -->
+<div id="leaderboard"></div>
 
 <script>
-let clicks=0,time=20,active=false,mult=1;
-let high=localStorage.getItem("high")||0;
-let leaderboard=JSON.parse(localStorage.getItem("lb"))||[];
+let clicks=0, coins=0, time=20;
+let active=false;
+let skin="blue";
 
-let bossHP=100,boss=false;
+let owned = JSON.parse(localStorage.getItem("owned")) || ["blue"];
+coins = Number(localStorage.getItem("coins")) || 0;
 
-const clicksEl=clicksSpan=document.getElementById("clicks");
+const clicksEl=document.getElementById("clicks");
+const coinsEl=document.getElementById("coins");
 const timeEl=document.getElementById("time");
-const highEl=document.getElementById("high");
-
 const btn=document.getElementById("clickBtn");
-const start=document.getElementById("startBtn");
-
-const bossBar=document.getElementById("bossBar");
-const bossUI=document.getElementById("boss");
-
-const wasted=document.getElementById("wasted");
-
-const bg=document.getElementById("bgMusic");
-const clickS=document.getElementById("clickSound");
-
-highEl.textContent=high;
+const shop=document.getElementById("shop");
 
 /* 🌌 stars */
-for(let i=0;i<120;i++){
+for(let i=0;i<80;i++){
  let s=document.createElement("div");
  s.className="star";
  s.style.left=Math.random()*100+"%";
@@ -173,73 +166,53 @@ for(let i=0;i<120;i++){
  document.body.appendChild(s);
 }
 
+/* update UI */
+function updateUI(){
+ clicksEl.textContent=clicks;
+ coinsEl.textContent=coins;
+ btn.className="skin-"+skin;
+}
+
 /* start */
-start.onclick=()=>{
+startBtn.onclick=()=>{
  active=true;
  btn.disabled=false;
- bg.play();
 };
 
 /* click */
 btn.onclick=(e)=>{
- if(!active)return;
+ if(!active) return;
 
- clicks+=mult;
- clicksEl.textContent=clicks;
+ clicks++;
+ coins+=1;
 
- clickS.currentTime=0;
- clickS.play();
+ spawnExplosion(e);
 
- document.body.classList.add("shake");
- setTimeout(()=>document.body.classList.remove("shake"),150);
+ updateUI();
 
- explode(e);
-
- if(clicks===100){time+=50;}
- if(clicks===250){time+=120;mult=2;}
-
- if(clicks===150 && !boss)startBoss();
-
- if(boss){
-   bossHP-=2;
-   bossBar.style.width=bossHP+"%";
-   if(bossHP<=0){
-     boss=false;
-     bossUI.style.display="none";
-     time+=20;
-   }
- }
+ if(clicks===100) time+=50;
+ if(clicks===150) startBoss();
 };
 
 /* explosion */
-function explode(e){
- let x=document.createElement("div");
- x.className="explosion";
- x.style.left=e.clientX+"px";
- x.style.top=e.clientY+"px";
- document.body.appendChild(x);
- setTimeout(()=>x.remove(),500);
+function spawnExplosion(e){
+ let ex=document.createElement("div");
+ ex.className="explosion";
+ ex.style.left=e.clientX+"px";
+ ex.style.top=e.clientY+"px";
+ document.body.appendChild(ex);
+ setTimeout(()=>ex.remove(),500);
 }
 
 /* boss */
+let bossHP=100;
 function startBoss(){
- boss=true;
+ document.getElementById("bossBox").style.display="block";
  bossHP=100;
- bossUI.style.display="block";
 }
 
-/* skins */
-function buySkin(c){
- let cost=c==="red"?200:400;
- if(clicks>=cost){
-   localStorage.setItem("skin",c);
-   location.reload();
- }
-}
-
-/* loop */
 setInterval(()=>{
- if(!active)return;
+ if(!active) return;
 
  time--;
  timeEl.textContent=time;
@@ -247,29 +220,74 @@ setInterval(()=>{
  if(time<=0){
    active=false;
    btn.disabled=true;
-
-   wasted.classList.add("show");
-
-   if(clicks>high){
-     localStorage.setItem("high",clicks);
-     highEl.textContent=clicks;
-   }
-
-   leaderboard.push(clicks);
-   leaderboard.sort((a,b)=>b-a);
-   leaderboard=leaderboard.slice(0,5);
-   localStorage.setItem("lb",JSON.stringify(leaderboard));
-
-   showLB();
+   saveScore();
  }
+
 },1000);
 
+/* shop system */
+const skins = [
+ {name:"blue", cost:0},
+ {name:"red", cost:50},
+ {name:"green", cost:100}
+];
+
+function renderShop(){
+ shop.innerHTML="";
+ skins.forEach(s=>{
+   let div=document.createElement("div");
+   div.className="skinCard";
+
+   let ownedText = owned.includes(s.name) ? "Use" : "Buy";
+
+   div.innerHTML=`
+     <div>${s.name}</div>
+     <div>${s.cost}</div>
+     <button>${ownedText}</button>
+   `;
+
+   div.querySelector("button").onclick=()=>{
+     if(owned.includes(s.name)){
+       skin=s.name;
+     } else if(coins>=s.cost){
+       coins-=s.cost;
+       owned.push(s.name);
+       localStorage.setItem("owned", JSON.stringify(owned));
+     }
+     save();
+     updateUI();
+     renderShop();
+   };
+
+   shop.appendChild(div);
+ });
+}
+
+/* save */
+function save(){
+ localStorage.setItem("coins", coins);
+}
+
 /* leaderboard */
-function showLB(){
+let lb=JSON.parse(localStorage.getItem("lb"))||[];
+function saveScore(){
+ lb.push(clicks);
+ lb.sort((a,b)=>b-a);
+ lb=lb.slice(0,5);
+ localStorage.setItem("lb",JSON.stringify(lb));
+ renderLB();
+}
+
+function renderLB(){
  let html="<b>Top</b><br>";
- leaderboard.forEach(s=>html+=s+"<br>");
+ lb.forEach(s=>html+=s+"<br>");
  document.getElementById("leaderboard").innerHTML=html;
 }
+
+/* init */
+updateUI();
+renderShop();
+renderLB();
 </script>
 
 </body>
